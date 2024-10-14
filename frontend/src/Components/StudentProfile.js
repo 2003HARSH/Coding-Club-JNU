@@ -7,7 +7,7 @@ function StudentAttendance() {
   const [classCode, setClassCode] = useState('');
   const [attendanceRecord, setAttendanceRecord] = useState(null);
   const [errorMessage, setErrorMessage] = useState('');
-
+let token =true
   const handleSubmit = async (e) => {
     e.preventDefault(); 
     try {
@@ -54,7 +54,7 @@ const handleSubmit2 = async (e)=>{
   return (<>
   <h2 className="heading">Student Section</h2>
     <div className="attendance-container">
-   
+   {token && 
       <div className="attendance-section">
         <h2>Submit Attendance</h2>
         <form onSubmit={handleSubmit}>
@@ -79,7 +79,7 @@ const handleSubmit2 = async (e)=>{
         {errorMessage && <p className="error-message">{errorMessage}</p>}
       </div>
 
- 
+   }
       <div className="attendance-section">
         <h2>View Attendance Record</h2>
         <form onSubmit={handleSubmit2}>
