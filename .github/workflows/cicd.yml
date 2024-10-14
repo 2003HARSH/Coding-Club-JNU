@@ -20,7 +20,7 @@ jobs:
         node-version: '18'
 
     - name: Install Dependencies
-      working-directory: ./front-end  
+      working-directory: ./frontend  
       run: |
         npm install
 
