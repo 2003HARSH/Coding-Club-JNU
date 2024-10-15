@@ -7,11 +7,11 @@ function StudentAttendance() {
   const [classCode, setClassCode] = useState('');
   const [attendanceRecord, setAttendanceRecord] = useState(null);
   const [errorMessage, setErrorMessage] = useState('');
-let token =true
+  let token = true
   const handleSubmit = async (e) => {
-    e.preventDefault(); 
+    e.preventDefault();
     try {
-      const response = await fetch('localhost:3000', {
+      const response = await fetch('localhost:5000/StudentAttendance', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -24,62 +24,62 @@ let token =true
       }
 
       const data = await response.json();
-      setAttendanceRecord(data); 
+      setAttendanceRecord(data);
       setErrorMessage('');
     } catch (error) {
       setErrorMessage('Failed to fetch attendance record. Please try again.');
       console.error('Error:', error);
     }
   };
-const handleSubmit2 = async (e)=>{
-  e.preventDefault();
-  try {
-    const response= fetch('localhost:3000',{
-      method:'POST',
-      headers:{
-        'Content-Type':'application/json',
-      },
-      body:JSON.stringify({enrollmentNumber1}),
-    });
-    if(!response.ok){
-      throw new Error('Network response is not ok');
+  const handleSubmit2 = async (e) => {
+    e.preventDefault();
+    try {
+      const response = fetch('localhost:5000/AttendanceRecord', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ enrollmentNumber1 }),
+      });
+      if (!response.ok) {
+        throw new Error('Network response is not ok');
+      }
+      const data = (await response).json();
+      setAttendanceRecord(data);
+      setErrorMessage('')
+    } catch (error) {
+      setErrorMessage('404 error');
     }
-    const data = (await response).json();
-    setAttendanceRecord(data); 
-    setErrorMessage('')
-  } catch (error) {
-    setErrorMessage('404 error');
   }
-}
   return (<>
-  <h2 className="heading">Student Section</h2>
+    <h2 className="heading">Student Section</h2>
     <div className="attendance-container">
-   {token && 
-      <div className="attendance-section">
-        <h2>Submit Attendance</h2>
-        <form onSubmit={handleSubmit}>
-          <label htmlFor="enrollment-number">Enrollment Number:</label>
-          <input
-            type="text"
-            id="enrollment-number"
-            value={enrollmentNumber}
-            onChange={(e) => setEnrollmentNumber(e.target.value)}
-            required
-          />
-          <label htmlFor="class-code">Class Code:</label>
-          <input
-            type="text"
-            id="class-code"
-            value={classCode}
-            onChange={(e) => setClassCode(e.target.value)}
-            required
-          />
-          <button type="submit" className="submit-btn">Submit Attendance</button>
-        </form>
-        {errorMessage && <p className="error-message">{errorMessage}</p>}
-      </div>
+      {token &&
+        <div className="attendance-section">
+          <h2>Submit Attendance</h2>
+          <form onSubmit={handleSubmit}>
+            <label htmlFor="enrollment-number">Enrollment Number:</label>
+            <input
+              type="text"
+              id="enrollment-number"
+              value={enrollmentNumber}
+              onChange={(e) => setEnrollmentNumber(e.target.value)}
+              required
+            />
+            <label htmlFor="class-code">Class Code:</label>
+            <input
+              type="text"
+              id="class-code"
+              value={classCode}
+              onChange={(e) => setClassCode(e.target.value)}
+              required
+            />
+            <button type="submit" className="submit-btn">Submit Attendance</button>
+          </form>
+          {errorMessage && <p className="error-message">{errorMessage}</p>}
+        </div>
 
-   }
+      }
       <div className="attendance-section">
         <h2>View Attendance Record</h2>
         <form onSubmit={handleSubmit2}>
@@ -93,12 +93,12 @@ const handleSubmit2 = async (e)=>{
           />
           <button type="submit" className="view-record-btn">View Attendance</button>
         </form>
-        
+
         {attendanceRecord && (
           <div className="attendance-record">
             <h3>Your Attendance Record</h3>
             <ul>
-             
+
               {attendanceRecord.map((subject, index) => (
                 <li key={index}>
                   {subject.name}: {subject.attendancePercentage}% ({subject.attendanceCount} classes attended)
@@ -109,7 +109,7 @@ const handleSubmit2 = async (e)=>{
         )}
       </div>
     </div>
-    </>
+  </>
   );
 }
 
