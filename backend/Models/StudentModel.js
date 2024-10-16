@@ -8,12 +8,10 @@ const studentSchema = new mongoose.Schema({
   phone: {
     type: String,
     required: true,
-    unique: true,
   },
   enrollmentNumber: {
     type: String,
     required: true,
-    unique: true,
   },
   center: {
     type: String,
@@ -23,11 +21,11 @@ const studentSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
- 
+
   registrationDate: {
     type: Date,
     default: Date.now,
   },
-},{ collection: 'Student' });
+}, { collection: 'Student' });
 
 module.exports = mongoose.model('Student', studentSchema);                                                          
