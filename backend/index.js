@@ -11,7 +11,7 @@ app.use(express.json());
 
 app.use(Student1);
 
-const uri = process.env.URI;
+const uri = process.env.URI ;
 const PORT = process.env.PORT ;
 
 
