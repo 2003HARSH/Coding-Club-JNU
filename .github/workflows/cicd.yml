@@ -33,3 +33,7 @@ jobs:
       - name: Build Images Using Docker Compose
         run: |
           docker-compose build
+          
+      - name: Push Images to Docker Hub
+        run: |
+          docker-compose push
