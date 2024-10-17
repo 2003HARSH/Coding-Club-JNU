@@ -1,4 +1,4 @@
-version: "3.8"
+version: "3"
 
 services:
   frontend:
@@ -7,7 +7,6 @@ services:
       - "3000:3000"
     depends_on:
       - backend
-    image: 2003harsh/jnu-coding-studio:frontend
 
   backend:
     build: ./backend
@@ -15,4 +14,3 @@ services:
       - "5000:5000"
     environment:
       - MONGODB_URI=${MONGODB_URI}
-    image: 2003harsh/jnu-coding-studio:backend

@@ -10,19 +10,14 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      REPO_NAME: 2003harsh/jnu-coding-studio
+      MONGODB_URI: ${{ secrets.MONGODB_URI }}
 
     steps:
-      - name: Checkout Code
+      - name: Checkout code
         uses: actions/checkout@v3
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
-
-      - name: Install Docker Compose
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y docker-compose
 
       - name: Log in to DockerHub
         uses: docker/login-action@v2
@@ -30,18 +25,12 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Generate .env File (Backend)
+      - name: Build and push frontend image
         run: |
-          echo "MONGODB_URI=${{ secrets.MONGODB_URI }}" > backend/.env
+          docker build -t $DOCKER_USERNAME/frontend:latest ./frontend
+          docker push $DOCKER_USERNAME/frontend:latest
 
-      - name: Build and Push Frontend Image
+      - name: Build and push backend image
         run: |
-          docker-compose build frontend
-          docker tag 2003harsh/jnu-coding-studio:frontend 
-          docker push 2003harsh/jnu-coding-studio:frontend 
-
-      - name: Build and Push Backend Image
-        run: |
-          docker-compose build backend
-          docker tag 2003harsh/jnu-coding-studio:backend 
-          docker push 2003harsh/jnu-coding-studio:backend
+          docker build -t $DOCKER_USERNAME/backend:latest ./backend
+          docker push $DOCKER_USERNAME/backend:latest
