@@ -11,8 +11,8 @@ app.use(express.json());
 
 app.use(Student1);
 
-const uri = process.env.URI ;
-const PORT = process.env.PORT ;
+const uri = process.env.MONGODB_URI ;
+const PORT = 5000 ;
 
 
 mongoose.connect(uri, {
