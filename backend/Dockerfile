@@ -10,4 +10,6 @@ COPY . .
 
 EXPOSE 5000
 
+ENV MONGODB_URI=${MONGODB_URI}
+
 CMD ["node","index"]
