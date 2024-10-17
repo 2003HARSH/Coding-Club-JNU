@@ -31,8 +31,7 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Deploy with Docker Compose
+      - name: Build and push images
         run: |
-          docker-compose down
-          docker-compose pull
-          docker-compose up -d
+          docker-compose build
+          docker-compose push
