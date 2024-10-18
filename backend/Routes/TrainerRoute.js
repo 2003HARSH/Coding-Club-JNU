@@ -24,21 +24,19 @@ router.post('/TrainerRegistration', async (req, res) => {
 
             if (trainerWithSameSubject) {
                 return res.status(409).json({ message: "You are already registered for this subject" });
-            } else {
-                return res.status(409).json({ message: "Trainer with this phone or ID is already registered but not for this subject" });
             }
+
+
+            const newTrainer = new Trainer({
+                name,
+                phone,
+                TrainerId,
+                subjectCode,
+            });
+
+            const savedTrainer = await newTrainer.save();
+            res.status(201).json({ message: 'Successfully Registered , You can now login With your TrainerId', savedTrainer });
         }
-
-        const newTrainer = new Trainer({
-            name,
-            phone,
-            TrainerId,
-            subjectCode,
-        });
-
-        const savedTrainer = await newTrainer.save();
-        res.status(201).json({ message: 'Successfully Trainer saved', savedTrainer });
-
     } catch (error) {
         res.status(500).json({ message: 'Error saving trainer', error });
     }

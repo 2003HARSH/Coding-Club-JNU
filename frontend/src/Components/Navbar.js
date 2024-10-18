@@ -19,15 +19,25 @@ function Navbar() {
         <Link className="nav-link" to="/Student">Student</Link>
       </li>
       <li className="nav-item dropdown">
-        <a className="nav-link dropdown-toggle" href="/" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-          Trainer
-        </a>
-        <ul className="dropdown-menu">
-          <li><a className="dropdown-item" href="/">Register</a></li>
-          <li><a className="dropdown-item" href="/">Login</a></li>
-         
-        </ul>
-      </li>
+  <a 
+    className="nav-link dropdown-toggle" 
+    href="/" 
+    role="button" 
+    data-bs-toggle="dropdown" 
+    aria-expanded="false"
+  >
+    Trainer
+  </a>
+  <ul className="dropdown-menu">
+    <li>
+      <a className="dropdown-item" href="/register">Register</a>
+    </li>
+    <li>
+      <a className="dropdown-item" href="/login">Login</a>
+    </li>
+  </ul>
+</li>
+
       <li className="nav-item">
         <a className="nav-link " href='/'>Admin</a>
       </li>
