@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-
+const bcrypt = require('bcrypt');
 async function TrainerFindByPhoneOrId(phone, TrainerId) {
     return await Trainer.findOne({
         $or: [{ phone }, { TrainerId }]
@@ -15,7 +15,7 @@ async function TrainerFindBySubject(phone, TrainerId, subjectCode) {
 }
 
 router.post('/TrainerRegistration', async (req, res) => {
-    const { name, TrainerId, phone, subjectCode } = req.body;
+    const { name, TrainerId, phone, subjectCode,password } = req.body;
     try {
         const existingTrainer = await TrainerFindByPhoneOrId(phone, TrainerId);
 
@@ -25,13 +25,14 @@ router.post('/TrainerRegistration', async (req, res) => {
             if (trainerWithSameSubject) {
                 return res.status(409).json({ message: "You are already registered for this subject" });
             }
-
+            const hashedPassword = await bcrypt.hash(password, 10);
 
             const newTrainer = new Trainer({
                 name,
                 phone,
                 TrainerId,
                 subjectCode,
+                password:hashedPassword
             });
 
             const savedTrainer = await newTrainer.save();
