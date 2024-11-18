@@ -1,90 +1,119 @@
 # JNU Coding Club Attendance System
 
 ## Overview
-The JNU Coding Club Attendance System is a web application designed to streamline the attendance marking process for trainers and students. This project enables trainers to set attendance timings, allows students to mark their attendance online, and ensures that attendance records are easily accessible to both parties. Additionally, new students will automatically receive a WhatsApp group invitation upon marking their first attendance.
+
+The **JNU Coding Club Attendance System** is a comprehensive web application designed to simplify attendance management for trainers and students. This application enables trainers to set attendance timings, allows students to mark attendance online, and ensures easy access to attendance records for both parties. Additionally, new students are automatically invited to a WhatsApp group upon marking their first attendance.
+
+---
 
 ## Features
+
 - **Attendance Timing Management**: Trainers can set specific timings for attendance.
-- **Online Attendance Marking**: Students can mark their attendance from anywhere.
-- **Attendance Records Access**: Both trainers and students can view attendance records.
-- **Automatic WhatsApp Invitations**: New students receive a WhatsApp group invitation after marking their first attendance.
-- **Online Database Storage**: Attendance data is securely stored in a MongoDB database.
-- **Tech Stack**:
-  - **Frontend**: HTML, CSS, JavaScript
-  - **Backend**: Node.js
-  - **Database**: MongoDB
-  - **Version Control**: GitHub
-  - **Deployment**: Netlify, AWS
-- **Continuous Integration/Continuous Deployment (CI/CD)**: A CI/CD pipeline is implemented to ensure seamless integration and deployment.
-- **Containerization**: The application is containerized using Docker.
+- **Online Attendance Marking**: Students can mark their attendance from anywhere using the application.
+- **Attendance Records Access**: Trainers and students can view attendance records seamlessly.
+- **Automatic WhatsApp Invitations**: New students are invited to a WhatsApp group after their first attendance.
+- **Secure Database Storage**: Attendance data is securely stored in a MongoDB database.
+- **CI/CD Integration**: A CI/CD pipeline ensures smooth integration and deployment workflows.
+- **Containerization**: The application is fully containerized using Docker for consistent deployment.
+
+---
+
+## Tech Stack
+
+- **Frontend**: HTML, CSS, JavaScript
+- **Backend**: Node.js
+- **Database**: MongoDB
+- **Version Control**: GitHub
+- **Deployment**: Netlify, AWS (future plans to deploy via Amazon ECR/ECS using AWS CodeDeploy)
+- **CI/CD**: GitHub Actions
+- **Containerization**: Docker, Docker Compose
+
+---
 
 ## Installation
 
 To set up the project locally, follow these steps:
 
-1. Clone the repository:
-   ```bash
-   https://github.com/2003HARSH/Coding-Club-JNU.git
-   cd Coding-Club-JNU
-   ```
+### Clone the Repository:
+```bash
+git clone https://github.com/2003HARSH/Coding-Club-JNU.git
+cd Coding-Club-JNU
+```
 
-2. Set up the backend:
-   - Navigate to the backend directory.
-   - Install the required dependencies:
-     ```bash
-     npm install
-     ```
-   - Configure your environment variables for database connection.
+### Docker Compose Setup:
+Ensure Docker and Docker Compose are installed on your system. Use the following command to run the application:
 
-3. Set up the frontend:
-   - Navigate to the frontend directory.
-   - Install the required dependencies:
-     ```bash
-     npm install
-     ```
+```bash
+docker-compose up --build
+```
 
-4. Run the application:
-   - Start the backend server:
-     ```bash
-     node server.js
-     ```
-   - Start the frontend application:
-     ```bash
-     npm start
-     ```
+This command will:
+- Build and run both frontend and backend Docker containers.
+- Expose the frontend on port `3000` and the backend on port `5000`.
 
-5. Access the application:
-   Open your web browser and go to `http://localhost:3000`.
+---
 
 ## Usage
 
-- **For Trainers**:
-  - Log in to the admin panel to set attendance timings and view records.
+### For Trainers:
+- Log in to the admin panel to:
+  - Set attendance timings.
+  - View attendance records.
 
-- **For Students**:
-  - Register and log in to mark your attendance and view your records.
+### For Students:
+- Register and log in to:
+  - Mark attendance online.
+  - View personal attendance records.
+
+---
+
+## Docker Images
+
+### Frontend
+Pull the latest Docker image for the frontend:
+```bash
+docker pull 2003harsh/jnu-coding-studio:frontend
+```
+
+Run the frontend container:
+```bash
+docker run -d -p 3000:3000 2003harsh/jnu-coding-studio:frontend
+```
+
+### Backend
+Pull the latest Docker image for the backend:
+```bash
+docker pull 2003harsh/jnu-coding-studio:backend
+```
+
+Run the backend container:
+```bash
+docker run -d -p 5000:5000 -e <MONGODB_URI> 2003harsh/jnu-coding-studio:backend
+```
+
+---
 
 ## CI/CD and Deployment
 
-This project uses GitHub Actions for CI/CD, ensuring that any changes pushed to the main branch are automatically tested, containerized and deployed to production environment.
+- **CI/CD Integration**: The project uses GitHub Actions to automate testing, containerization, and deployment. Any changes pushed to the `main` branch are automatically built and tested.
+- **Future Deployment Plans**:
+  - Deploy the application to **Amazon Elastic Container Registry (ECR)** and **Amazon Elastic Container Service (ECS)** using **AWS CodeDeploy** for scalable, cloud-based deployment.
 
-## Docker
+---
 
-To run the application in a container, use the following commands:
+## Future Plans
 
-1. Pull the Docker image from dockerhub:
-   ```bash
-   docker pull 2003harsh/attendance-system-frontend:latest
-   ```
+1. **Enhanced Deployment**: 
+   - Transition to **AWS ECR and ECS** for hosting and managing containerized applications. 
+   - Automate deployments with **AWS CodeDeploy** for seamless integration and scaling.
+2. **New Features**: Add advanced functionalities such as analytics dashboards for attendance trends and notifications for students.
+3. **Mobile Support**: Develop a mobile-friendly version or dedicated mobile app to increase accessibility.
 
-2. Run the container:
-   ```bash
-   docker run -p 3000:3000 2003harsh/attendance-system-frontend:latest
-   ```
+---
 
 ## Contributing
 
-We welcome contributions! If you would like to contribute to the project, please follow these steps:
+We welcome contributions! Follow these steps to contribute:
 
 1. Fork the repository.
 2. Create a new branch:
@@ -101,15 +130,17 @@ We welcome contributions! If you would like to contribute to the project, please
    ```
 5. Open a pull request.
 
+---
+
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the [MIT License](LICENSE).
 
-## Acknowledgements
+---
 
-- Special thanks to the JNU Coding Club for the inspiration and support.
-- Thanks to all contributors for their efforts in making this project a success.
 
 ## Contact
 
-For questions or feedback, please reach out to [harshnkgupta@gmail.com](mailto:harshnkgupta@gmail.com) OR [jitripathi426@gmail.com](mailto:jitripathi426@gmail.com) 
+For questions or feedback, feel free to reach out:
+- **Email**: harshnkgupta@gmail.com  
+- **Email**: jitripathi426@gmail.com  
