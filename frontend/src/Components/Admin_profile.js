@@ -17,10 +17,10 @@ function Admin_profile() {
 
   const subjects = [
     "Math 101",
-    "Science 102",
-    "History 103",
-    "English 104",
-    "Computer Science 105",
+    "Science102",
+    "History103",
+    "English104",
+    "ComputerScience105",
   ];
 
   useEffect(() => {
