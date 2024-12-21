@@ -10,7 +10,11 @@ function StudentRegistration() {
     subjectCode: '',
   });
 
-  const subjectOptions = ['CS101', 'CS102', 'MATH201', 'PHY301', 'ENG401']; // Predefined subject codes
+  const subjectOptions = [ "Math 101",
+    "Science102",
+    "History103",
+    "English104",
+    "ComputerScience105"]; // Predefined subject codes
 
   function handleInputChange(e) {
     const { name, value } = e.target;

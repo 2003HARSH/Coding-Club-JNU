@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 import "./Styles/Admin_profile.css";
 
 function Admin_profile() {
@@ -12,6 +13,15 @@ function Admin_profile() {
     password: "",
   });
   const [responseMessage, setResponseMessage] = useState(null);
+  const navigate = useNavigate();
+
+  const subjects = [
+    "Math 101",
+    "Science 102",
+    "History 103",
+    "English 104",
+    "Computer Science 105",
+  ];
 
   useEffect(() => {
     const fetchTrainers = async () => {
@@ -42,25 +52,35 @@ function Admin_profile() {
         "http://localhost:5000/TrainerRegistration",
         newTrainer
       );
-      setTrainers([...trainers, response.data]);
-      setNewTrainer({
-        name: "",
-        phone: "",
-        TrainerId: "",
-        subjectCode: "",
-        password: "",
-      });
-      setResponseMessage({
-        type: "success",
-        text: "Trainer registered successfully!",
-      });
+
+      if (response.data && response.data.message) {
+        setResponseMessage({
+          type: "success",
+          text: response.data.message,
+        });
+
+        setTrainers([...trainers, response.data.savedTrainer]);
+      }
     } catch (error) {
       console.error("Error registering trainer:", error.response?.data || error.message);
       setResponseMessage({
         type: "error",
-        text: "Failed to register trainer. Please try again.",
+        text: error.response?.data?.message || "Failed to register trainer. Please try again.",
       });
     }
+
+    setNewTrainer({
+      name: "",
+      phone: "",
+      TrainerId: "",
+      subjectCode: "",
+      password: "",
+    });
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("authToken");
+    navigate("/");
   };
 
   return (
@@ -76,6 +96,10 @@ function Admin_profile() {
           {responseMessage.text}
         </div>
       )}
+
+      <button onClick={handleLogout} className="btn btn-danger">
+        Logout
+      </button>
 
       <h2>Register New Trainer</h2>
       <form onSubmit={handleRegister}>
@@ -111,13 +135,19 @@ function Admin_profile() {
         </div>
         <div>
           <label>Subject Code:</label>
-          <input
-            type="text"
+          <select
             name="subjectCode"
             value={newTrainer.subjectCode}
             onChange={handleChange}
             required
-          />
+          >
+            <option value="">Select Subject</option>
+            {subjects.map((subject, index) => (
+              <option key={index} value={subject}>
+                {subject}
+              </option>
+            ))}
+          </select>
         </div>
         <div>
           <label>Password:</label>
@@ -129,7 +159,9 @@ function Admin_profile() {
             required
           />
         </div>
-        <button type="submit">Register Trainer</button>
+        <button type="submit" className="btn btn-primary">
+          Register Trainer
+        </button>
       </form>
 
       <h2>Registered Trainers</h2>
@@ -138,7 +170,6 @@ function Admin_profile() {
           <tr>
             <th>Name</th>
             <th>Phone</th>
-          
             <th>Subject Code</th>
           </tr>
         </thead>
@@ -147,7 +178,6 @@ function Admin_profile() {
             <tr key={index}>
               <td>{trainer.name}</td>
               <td>{trainer.phone}</td>
-             
               <td>{trainer.subjectCode}</td>
             </tr>
           ))}

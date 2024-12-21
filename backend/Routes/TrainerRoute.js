@@ -2,16 +2,16 @@ const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcrypt');
 const Trainer = require('../Models/TrainerModel');
-const AttendanceTiming = require('../models/AttendanceTiming'); // Adjust to match your actual model location
+const AttendanceTiming = require('../Models/AttendanceTimingModel'); 
+const cron = require('node-cron');
 
-// Utility function to find trainer by phone or TrainerId
 async function TrainerFindByPhoneOrId(phone, TrainerId) {
     return await Trainer.findOne({
         $or: [{ phone }, { TrainerId }]
     });
 }
 
-// Utility function to find trainer by subject code
+
 async function TrainerFindBySubject(phone, TrainerId, subjectCode) {
     return await Trainer.findOne({
         $or: [{ phone }, { TrainerId }],
@@ -19,7 +19,7 @@ async function TrainerFindBySubject(phone, TrainerId, subjectCode) {
     });
 }
 
-// Register a new trainer
+
 router.post('/TrainerRegistration', async (req, res) => {
     const { name, phone, TrainerId, subjectCode, password } = req.body;
     try {
@@ -51,7 +51,7 @@ router.post('/TrainerRegistration', async (req, res) => {
     }
 });
 
-// Login for trainers
+
 router.post('/TrainerLogin', async (req, res) => {
   
   const { trainerId, password } = req.body;
@@ -86,7 +86,7 @@ router.post('/TrainerLogin', async (req, res) => {
 });
 
 
-// Fetch all trainers
+
 router.get('/fetchTrainer', async (req, res) => {
     try {
         const trainers = await Trainer.find();
@@ -97,9 +97,8 @@ router.get('/fetchTrainer', async (req, res) => {
     }
 });
 
-// Fetch a specific trainer by trainerId or subjectCode
 router.get('/api/trainers/:identifier', async (req, res) => {
-    const { identifier } = req.params; // identifier can be either trainerId or subjectCode
+    const { identifier } = req.params;
 
     try {
         const trainer = await Trainer.findOne({
@@ -167,7 +166,7 @@ router.get('/api/isAttendanceOpen', async (req, res) => {
     try {
         const activeSession = await AttendanceTiming.findOne({
             isAttendanceOpen: true,
-            endTime: { $gte: new Date() }, // Check if the session is still ongoing
+            endTime: { $gte: new Date() }, 
         });
 
         if (activeSession) {
@@ -182,6 +181,33 @@ router.get('/api/isAttendanceOpen', async (req, res) => {
 });
 
 
+
+
+
+cron.schedule('*/5 * * * *', async () => {
+    try {
+        const currentDate = new Date();
+        console.log('Checking for expired sessions at:', currentDate);
+
+        // Log the sessions that are about to be deleted
+        const expiredSessions = await AttendanceTiming.find({
+            endTime: { $lt: currentDate }
+        });
+        
+        console.log(`Found ${expiredSessions.length} expired sessions.`);
+
+        if (expiredSessions.length > 0) {
+            const deleteResult = await AttendanceTiming.deleteMany({
+                endTime: { $lt: currentDate }
+            });
+            console.log(`Deleted ${deleteResult.deletedCount} expired attendance sessions.`);
+        } else {
+            console.log('No expired sessions found.');
+        }
+    } catch (error) {
+        console.error('Error deleting expired sessions:', error);
+    }
+});
 
 
 module.exports = router;

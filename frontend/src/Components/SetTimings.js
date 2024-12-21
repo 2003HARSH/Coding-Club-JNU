@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom"; // Import useNavigate
 
 function TrainerSetTimings() {
   const [sessionTimings, setSessionTimings] = useState({
@@ -10,14 +11,16 @@ function TrainerSetTimings() {
   const [message, setMessage] = useState("");
 
   const subjectOptions = [
-    "Math101",
+    "Math 101",
     "Science102",
     "History103",
     "English104",
     "ComputerScience105",
   ];
 
-  const durationOptions = ["5", "8", "10", "12", "15"];
+  const durationOptions = ["1", "8", "10", "12", "15"];
+
+  const navigate = useNavigate(); // Initialize navigate hook
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -43,6 +46,12 @@ function TrainerSetTimings() {
       const errorMessage = error.response?.data?.error || "Error setting timings.";
       setMessage(errorMessage);
     }
+  };
+
+  const handleLogout = () => {
+    // Clear session data or remove any necessary state related to authentication
+    // Redirect to the home page directly
+    navigate("/");
   };
 
   return (
@@ -100,6 +109,10 @@ function TrainerSetTimings() {
           Set Timings
         </button>
       </form>
+
+      <button onClick={handleLogout} className="btn btn-danger btn-block mt-3">
+        Logout
+      </button>
     </div>
   );
 }
