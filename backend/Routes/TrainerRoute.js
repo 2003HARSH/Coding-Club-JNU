@@ -4,6 +4,7 @@ const bcrypt = require('bcrypt');
 const Trainer = require('../Models/TrainerModel');
 const AttendanceTiming = require('../Models/AttendanceTimingModel'); 
 const cron = require('node-cron');
+const { sub } = require('@tensorflow/tfjs');
 
 async function TrainerFindByPhoneOrId(phone, TrainerId) {
     return await Trainer.findOne({
@@ -119,46 +120,72 @@ router.get('/api/trainers/:identifier', async (req, res) => {
     }
 });
 
-
-router.post('/api/setSessionTimings', async (req, res) => {
-    const { subjectCode, duration } = req.body;
-
-    if (!subjectCode || !duration) {
-        return res.status(400).json({ message: 'Subject code and duration are required' });
-    }
-
+// Check if trainer is registered for the given subject
+// Check if trainer is registered for the given subject
+router.get('/api/checkTrainerSubject/:trainerId/:subjectCode', async (req, res) => {
+    const { trainerId, subjectCode } = req.params;
+  const TrainerId = trainerId;
     try {
-        // Calculate start and end times
-        const now = new Date();
-        const startTime = now;
-        const endTime = new Date(now.getTime() + duration * 60 * 1000); // duration in minutes
-
-        // Check if a timing already exists for the subjectCode
-        let timing = await AttendanceTiming.findOne({ subjectCode });
-
-        if (!timing) {
-            // Create a new record if it doesn't exist
-            timing = new AttendanceTiming({
-                subjectCode,
-                isAttendanceOpen: true,
-                startTime,
-                endTime,
-            });
-        } else {
-            // Update the existing record
-            timing.startTime = startTime;
-            timing.endTime = endTime;
-            timing.isAttendanceOpen = true;
-        }
-
-        await timing.save();
-        res.status(200).json({ message: 'Session timings set successfully', timing });
+      // Find the trainer by trainerId and subjectCode
+      const trainer = await Trainer.findOne({
+        TrainerId,
+        subjectCode,
+      });
+  
+      if (trainer) {
+        console.log()
+        res.status(200).json({ isRegistered: true });
+      } else {
+        console.log(subjectCode,TrainerId)
+    
+        res.status(404).json({ isRegistered: false, message: 'Trainer is not registered or not registered for this subject' });
+      }
     } catch (error) {
-        console.error('Error setting session timings:', error);
-        res.status(500).json({ message: 'Failed to set session timings', error: error.message });
+      console.error('Error checking trainer registration:', error);
+      res.status(500).json({ error: 'Error checking trainer registration' });
     }
-});
-
+  });
+  
+  
+  router.post('/api/setSessionTimings', async (req, res) => {
+    const { subjectCode, duration, trainerId } = req.body;
+    
+    console.log("Received data:", req.body); // Add logging for debugging
+  
+    if (!subjectCode || !duration) {
+      return res.status(400).json({ message: 'Subject code and duration are required' });
+    }
+  
+    try {
+      const now = new Date();
+      const startTime = now;
+      const endTime = new Date(now.getTime() + duration * 60 * 1000);
+  
+      // Check if a timing already exists for the subjectCode
+      let timing = await AttendanceTiming.findOne({ subjectCode });
+  
+      if (!timing) {
+        timing = new AttendanceTiming({
+          subjectCode,
+          isAttendanceOpen: true,
+          startTime,
+          endTime,
+        });
+      } else {
+        timing.startTime = startTime;
+        timing.endTime = endTime;
+        timing.isAttendanceOpen = true;
+      }
+  
+      await timing.save();
+      console.log("Session timings set:", timing); // Log the session timings that were set
+      res.status(200).json({ message: 'Session timings set successfully', timing });
+    } catch (error) {
+      console.error('Error setting session timings:', error);
+      res.status(500).json({ message: 'Failed to set session timings', error: error.message });
+    }
+  });
+  
 
 
 // Endpoint to check if attendance is open

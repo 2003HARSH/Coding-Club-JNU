@@ -1,11 +1,12 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom"; // Import useNavigate
+import { useNavigate } from "react-router-dom";
 
 function TrainerSetTimings() {
   const [sessionTimings, setSessionTimings] = useState({
     subjectCode: "",
     duration: "",
+    trainerId: "", // New state for trainerId
   });
 
   const [message, setMessage] = useState("");
@@ -20,37 +21,53 @@ function TrainerSetTimings() {
 
   const durationOptions = ["1", "8", "10", "12", "15"];
 
-  const navigate = useNavigate(); // Initialize navigate hook
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setSessionTimings({ ...sessionTimings, [name]: value });
   };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    if (!sessionTimings.subjectCode || !sessionTimings.duration) {
-      setMessage("Please select both subject code and duration.");
+  
+    if (!sessionTimings.subjectCode || !sessionTimings.duration || !sessionTimings.trainerId) {
+      setMessage("Please fill all the fields.");
       return;
     }
-
+  
     try {
-      const response = await axios.post(
-        "http://localhost:5000/api/setSessionTimings",
-        sessionTimings
+      const response = await axios.get(
+        `http://localhost:5000/api/checkTrainerSubject/${sessionTimings.trainerId}/${sessionTimings.subjectCode}`
       );
-      setMessage(response.data.message);
-      setSessionTimings({ subjectCode: "", duration: "" });
+  
+      if (response.data.isRegistered) {
+        const timingResponse = await axios.post(
+          "http://localhost:5000/api/setSessionTimings",
+          {
+            subjectCode: sessionTimings.subjectCode,
+            duration: sessionTimings.duration,
+            trainerId: sessionTimings.trainerId,
+          }
+        );
+  
+        setMessage(timingResponse.data.message);
+        setSessionTimings({ subjectCode: "", duration: "", trainerId: "" });
+      } else {
+        // Handle the case where the trainer is not registered for the subject
+        setMessage(response.data.message); // Display the message from the backend
+      }
     } catch (error) {
-      const errorMessage = error.response?.data?.error || "Error setting timings.";
+      // Handle errors from both axios requests
+      const errorMessage =
+        error.response?.data?.error ||
+        error.response?.data?.message ||
+        "Error setting timings.";
       setMessage(errorMessage);
     }
   };
-
+  
+  
   const handleLogout = () => {
-    // Clear session data or remove any necessary state related to authentication
-    // Redirect to the home page directly
     navigate("/");
   };
 
@@ -69,6 +86,18 @@ function TrainerSetTimings() {
       )}
 
       <form onSubmit={handleSubmit}>
+        <div className="form-group">
+          <label htmlFor="trainerId">Trainer ID:</label>
+          <input
+            type="text"
+            id="trainerId"
+            name="trainerId"
+            value={sessionTimings.trainerId}
+            onChange={handleChange}
+            required
+            className="form-control"
+          />
+        </div>
         <div className="form-group">
           <label htmlFor="subjectCode">Subject Code:</label>
           <select
