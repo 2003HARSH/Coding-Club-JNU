@@ -4,7 +4,7 @@ const bcrypt = require('bcrypt');
 const Trainer = require('../Models/TrainerModel');
 const AttendanceTiming = require('../Models/AttendanceTimingModel'); 
 const cron = require('node-cron');
-const { sub } = require('@tensorflow/tfjs');
+
 
 async function TrainerFindByPhoneOrId(phone, TrainerId) {
     return await Trainer.findOne({
@@ -161,7 +161,6 @@ router.get('/api/checkTrainerSubject/:trainerId/:subjectCode', async (req, res) 
       const startTime = now;
       const endTime = new Date(now.getTime() + duration * 60 * 1000);
   
-      // Check if a timing already exists for the subjectCode
       let timing = await AttendanceTiming.findOne({ subjectCode });
   
       if (!timing) {
