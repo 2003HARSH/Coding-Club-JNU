@@ -44,7 +44,7 @@ cd Coding-Club-JNU
 Ensure Docker and Docker Compose are installed on your system. Use the following command to run the application:
 
 ```bash
-docker-compose up --build
+docker-compose --env-file ./backend/.env up --build
 ```
 
 This command will:
