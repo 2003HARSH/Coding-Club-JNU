@@ -1,17 +1,21 @@
+
 # JNU Coding Club Attendance System
 
 ## Overview
 
-The **JNU Coding Club Attendance System** is a comprehensive web application designed to simplify attendance management for trainers and students. This application enables trainers to set attendance timings, allows students to mark attendance online, and ensures easy access to attendance records for both parties. Additionally, new students are automatically invited to a WhatsApp group upon marking their first attendance.
+The **JNU Coding Club Attendance System** is a comprehensive web application designed to simplify attendance management for trainers and students. This application enables trainers to set attendance timings, allows students to mark attendance online, and ensures easy access to attendance records for both parties.
 
 ---
 
 ## Features
 
+- **Trainer Profile Page**: Trainers can view all students enrolled in the subjects they handle.
+- **Session Uniqueness**: If an active session already exists for a subject, another session cannot be started until the previous one ends.
+- **Location-Based Attendance**: Students can only mark attendance if they are within the geofenced location of the trainer.
+- **Session Code & Subject Code Verification**: Attendance is validated using session and subject codes to ensure integrity.
 - **Attendance Timing Management**: Trainers can set specific timings for attendance.
 - **Online Attendance Marking**: Students can mark their attendance from anywhere using the application.
 - **Attendance Records Access**: Trainers and students can view attendance records seamlessly.
-- **Automatic WhatsApp Invitations**: New students are invited to a WhatsApp group after their first attendance.
 - **Secure Database Storage**: Attendance data is securely stored in a MongoDB database.
 - **CI/CD Integration**: A CI/CD pipeline ensures smooth integration and deployment workflows.
 - **Containerization**: The application is fully containerized using Docker for consistent deployment.
@@ -20,8 +24,8 @@ The **JNU Coding Club Attendance System** is a comprehensive web application des
 
 ## Tech Stack
 
-- **Frontend**: HTML, CSS, JavaScript
-- **Backend**: Node.js
+- **Frontend**: React.js
+- **Backend**: Node.js,Express.js
 - **Database**: MongoDB
 - **Version Control**: GitHub
 - **Deployment**: Netlify, AWS (future plans to deploy via Amazon ECR/ECS using AWS CodeDeploy)
@@ -44,7 +48,7 @@ cd Coding-Club-JNU
 Ensure Docker and Docker Compose are installed on your system. Use the following command to run the application:
 
 ```bash
-docker-compose --env-file ./backend/.env up --build
+docker-compose --env-file ./backend/.env up --build
 ```
 
 This command will:
@@ -59,10 +63,14 @@ This command will:
 - Log in to the admin panel to:
   - Set attendance timings.
   - View attendance records.
+  - View students enrolled in their subjects.
+  - Prevent multiple sessions from starting for the same subject.
 
 ### For Students:
 - Register and log in to:
   - Mark attendance online.
+  - Mark attendance only if within the required location boundary.
+  - Enter valid subject and session codes.
   - View personal attendance records.
 
 ---
@@ -137,7 +145,6 @@ We welcome contributions! Follow these steps to contribute:
 This project is licensed under the [MIT License](LICENSE).
 
 ---
-
 
 ## Contact
 
