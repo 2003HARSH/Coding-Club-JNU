@@ -12,10 +12,9 @@ function StudentRegistration() {
 
   const subjectOptions = [ "Math 101",
     "Science102",
-    "History103",
+    "Matlab103",
     "English104",
-    "ComputerScience105"]; // Predefined subject codes
-
+    "ComputerScience105"]; 
   function handleInputChange(e) {
     const { name, value } = e.target;
     setStudent({ ...student, [name]: value });

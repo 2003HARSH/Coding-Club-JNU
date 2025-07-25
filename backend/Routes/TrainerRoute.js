@@ -4,7 +4,8 @@ const bcrypt = require('bcrypt');
 const Trainer = require('../Models/TrainerModel');
 const AttendanceTiming = require('../Models/AttendanceTimingModel'); 
 const cron = require('node-cron');
-
+const Student = require('../Models/StudentModel');
+const Attendance = require('../Models/AttendanceModel');
 
 async function TrainerFindByPhoneOrId(phone, TrainerId) {
     return await Trainer.findOne({
@@ -53,36 +54,42 @@ router.post('/TrainerRegistration', async (req, res) => {
 });
 
 
+const jwt = require('jsonwebtoken');
+require('dotenv').config();
+
 router.post('/TrainerLogin', async (req, res) => {
-  
   const { trainerId, password } = req.body;
 
   if (!trainerId || !password) {
-      return res.status(400).json({ message: 'Trainer ID and password are required' });
+    return res.status(400).json({ message: 'Trainer ID and password are required' });
   }
 
   try {
-      console.log('Login attempt for:', trainerId);
-      const trainer = await Trainer.findOne({ TrainerId: trainerId }); // Match field name
+    const trainer = await Trainer.findOne({ TrainerId: trainerId });
 
-      if (!trainer) {
-          console.log('Trainer not found:', trainerId);
-          return res.status(404).json({ message: 'Trainer not found' });
-      }
+    if (!trainer) {
+      return res.status(404).json({ message: 'Trainer not found' });
+    }
 
-      console.log('Trainer found:', trainer);
-      const isPasswordValid = await bcrypt.compare(password, trainer.password);
+    const isPasswordValid = await bcrypt.compare(password, trainer.password);
 
-      if (!isPasswordValid) {
-          console.log('Invalid password for:', trainerId);
-          return res.status(401).json({ message: 'Invalid credentials' });
-      }
+    if (!isPasswordValid) {
+      return res.status(401).json({ message: 'Invalid credentials' });
+    }
 
-      console.log('Login successful for:', trainerId);
-      return res.status(200).json({ message: 'Login successful', trainer });
+    const token = jwt.sign(
+      { trainerId: trainer.TrainerId },
+      process.env.JWT_SECRET,
+      { expiresIn: '1h' }
+    );
+res.status(200).json({ 
+  message: 'Login successful',
+  token,
+  trainerId: trainer.TrainerId,
+  subjectCode: trainer.subjectCode  
+});
   } catch (error) {
-      console.error('Error during login:', error);
-      res.status(500).json({ message: 'Server error during login', error: error.message });
+    res.status(500).json({ message: 'Server error during login', error: error.message });
   }
 });
 
@@ -120,13 +127,24 @@ router.get('/api/trainers/:identifier', async (req, res) => {
     }
 });
 
-// Check if trainer is registered for the given subject
-// Check if trainer is registered for the given subject
-router.get('/api/checkTrainerSubject/:trainerId/:subjectCode', async (req, res) => {
+function verifyToken(req, res, next) {
+  const authHeader = req.headers.authorization;
+  if (!authHeader) return res.status(403).json({ message: 'Token required' });
+
+  const token = authHeader.split(' ')[1];
+
+  jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+    if (err) return res.status(401).json({ message: 'Invalid token' });
+    req.trainer = decoded;
+    next();
+  });
+}
+
+router.get('/api/checkTrainerSubject/:trainerId/:subjectCode', verifyToken,async (req, res) => {
     const { trainerId, subjectCode } = req.params;
   const TrainerId = trainerId;
     try {
-      // Find the trainer by trainerId and subjectCode
+
       const trainer = await Trainer.findOne({
         TrainerId,
         subjectCode,
@@ -146,48 +164,111 @@ router.get('/api/checkTrainerSubject/:trainerId/:subjectCode', async (req, res) 
     }
   });
   
-  
-  router.post('/api/setSessionTimings', async (req, res) => {
-    const { subjectCode, duration, trainerId } = req.body;
-    
-    console.log("Received data:", req.body); // Add logging for debugging
-  
-    if (!subjectCode || !duration) {
-      return res.status(400).json({ message: 'Subject code and duration are required' });
+  router.get('/api/studentsBySubject/:subjectCode', verifyToken, async (req, res) => {
+  const { subjectCode } = req.params;
+  try {
+    const students = await Student.find({ subjectCode });
+    res.status(200).json({ students });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch students' });
+  }
+});
+router.get('/api/todayAttendance/:subjectCode', verifyToken, async (req, res) => {
+  const { subjectCode } = req.params;
+
+  const start = new Date();
+  start.setHours(0, 0, 0, 0);
+  const end = new Date();
+  end.setHours(23, 59, 59, 999);
+
+  try {
+    const attendance = await Attendance.find({
+      subjectCode,
+      attendanceDate: { $gte: start, $lte: end }
+    }).populate('studentId', 'name enrollmentNumber');
+
+    res.status(200).json({ attendance });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch attendance records' });
+  }
+});
+router.delete('/api/deleteAttendance/:id', async (req, res) => {
+  console.log("hheh")
+  try {
+    const { id } = req.params;
+    const deleted = await Attendance.findByIdAndDelete(id);
+
+    if (!deleted) {
+      return res.status(404).json({ message: "Attendance record not found." });
     }
-  
-    try {
-      const now = new Date();
-      const startTime = now;
-      const endTime = new Date(now.getTime() + duration * 60 * 1000);
-  
-      let timing = await AttendanceTiming.findOne({ subjectCode });
-  
-      if (!timing) {
-        timing = new AttendanceTiming({
-          subjectCode,
-          isAttendanceOpen: true,
-          startTime,
-          endTime,
-        });
-      } else {
-        timing.startTime = startTime;
-        timing.endTime = endTime;
-        timing.isAttendanceOpen = true;
-      }
-  
-      await timing.save();
-      console.log("Session timings set:", timing); // Log the session timings that were set
-      res.status(200).json({ message: 'Session timings set successfully', timing });
-    } catch (error) {
-      console.error('Error setting session timings:', error);
-      res.status(500).json({ message: 'Failed to set session timings', error: error.message });
+
+    res.status(200).json({ message: "Attendance record deleted successfully." });
+  } catch (error) {
+    console.error("Delete error:", error);
+    res.status(500).json({ message: "Error deleting attendance record." });
+  }
+});
+
+const generateRandomCode = () => {
+  return Math.random().toString(36).substring(2, 8).toUpperCase(); // e.g., '3F4D9K'
+};
+
+router.post('/api/setSessionTimings', async (req, res) => {
+  const { subjectCode, duration, trainerId, latitude, longitude } = req.body;
+
+  if (!subjectCode || !duration || latitude == null || longitude == null) {
+    return res.status(400).json({ message: 'Subject code, duration and location required' });
+  }
+
+  try {
+    const now = new Date();
+    const endTime = new Date(now.getTime() + duration * 60 * 1000);
+
+ 
+    const existingSession = await AttendanceTiming.findOne({
+      subjectCode,
+      isAttendanceOpen: true,
+      startTime: { $lte: now },
+      endTime: { $gte: now }
+    });
+
+    if (existingSession) {
+      return res.status(409).json({
+        message: 'An attendance session is already active for this subject.',
+        sessionCode: existingSession.sessionCode,
+        endTime: existingSession.endTime,
+      });
     }
-  });
+
+    const sessionCode = generateRandomCode();
+
+    const newTiming = new AttendanceTiming({
+      subjectCode,
+      isAttendanceOpen: true,
+      startTime: now,
+      endTime,
+      latitude,
+      longitude,
+      sessionCode,
+      trainerId
+    });
+
+    await newTiming.save();
+
+    res.status(200).json({
+      message: '✅ Session timings set successfully',
+      sessionCode,
+      timing: newTiming
+    });
+  } catch (error) {
+    console.error('Error setting session timings:', error);
+    res.status(500).json({ message: 'Failed to set session timings', error: error.message });
+  }
+});
+
   
 
 
-// Endpoint to check if attendance is open
 router.get('/api/isAttendanceOpen', async (req, res) => {
     try {
         const activeSession = await AttendanceTiming.findOne({

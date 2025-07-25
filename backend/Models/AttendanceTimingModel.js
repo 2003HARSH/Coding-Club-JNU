@@ -17,6 +17,9 @@ const attendanceTimingSchema = new mongoose.Schema({
         type: Date,
         required: true,
     },
+      latitude: Number,   // NEW
+  longitude: Number,
+    sessionCode: String,
 },{ collection: 'AttendanceTiming' });
 
 module.exports = mongoose.model('AttendanceTiming', attendanceTimingSchema);
