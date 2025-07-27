@@ -7,6 +7,7 @@ function TrainerSetTimings() {
     subjectCode: "",
     duration: "",
     trainerId: "",
+    deviation : 1,
   });
 
   const [location, setLocation] = useState({ latitude: null, longitude: null });
@@ -25,7 +26,6 @@ const [existingSessionInfo, setExistingSessionInfo] = useState(null);
     "ComputerScience105",
   ];
   const durationOptions = ["1", "8", "10", "12", "15"];
-
   useEffect(() => {
     const token = localStorage.getItem("trainerToken");
     const trainerId = localStorage.getItem("trainerId");
@@ -48,10 +48,15 @@ const [existingSessionInfo, setExistingSessionInfo] = useState(null);
     }
   }, [sessionTimings.subjectCode]);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setSessionTimings((prev) => ({ ...prev, [name]: value }));
-  };
+ const handleChange = (e) => {
+  const { name, value } = e.target;
+
+  setSessionTimings((prev) => ({
+    ...prev,
+    [name]: name === "deviation" ? Number(value) : value,  
+  }));
+};
+
 
   const getLocation = () => {
     if (!navigator.geolocation) {
@@ -75,7 +80,7 @@ const [existingSessionInfo, setExistingSessionInfo] = useState(null);
   };
 const handleSubmit = async (e) => {
   e.preventDefault();
-  const { subjectCode, duration, trainerId } = sessionTimings;
+  const { subjectCode, duration, trainerId ,deviation} = sessionTimings;
   const { latitude, longitude } = location;
   const token = localStorage.getItem("trainerToken");
 
@@ -97,7 +102,7 @@ const handleSubmit = async (e) => {
 
     const response = await axios.post(
       "http://localhost:5000/api/setSessionTimings",
-      { subjectCode, duration, trainerId, latitude, longitude },
+      { subjectCode, duration, trainerId, latitude, longitude,deviation },
       { headers: { Authorization: `Bearer ${token}` } }
     );
 
@@ -210,7 +215,16 @@ const handleSubmit = async (e) => {
             ))}
           </select>
         </div>
-
+   <div className="form-group">
+         <input
+         name="deviation"
+  type="number"
+  value={sessionTimings.deviation}
+  onChange={handleChange}
+  min="1"
+  max="10"
+/>
+   </div>
         <div className="form-group">
           <label>Duration (minutes):</label>
           <select

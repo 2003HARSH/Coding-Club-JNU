@@ -214,10 +214,10 @@ const generateRandomCode = () => {
 };
 
 router.post('/api/setSessionTimings', async (req, res) => {
-  const { subjectCode, duration, trainerId, latitude, longitude } = req.body;
+  const { subjectCode, duration, trainerId, latitude, longitude ,deviation} = req.body;
 
-  if (!subjectCode || !duration || latitude == null || longitude == null) {
-    return res.status(400).json({ message: 'Subject code, duration and location required' });
+  if (!subjectCode || !duration || latitude == null || longitude == null || !deviation) {
+    return res.status(400).json({ message: 'Subject code, duration ,deviation and location required' });
   }
 
   try {
@@ -250,7 +250,8 @@ router.post('/api/setSessionTimings', async (req, res) => {
       latitude,
       longitude,
       sessionCode,
-      trainerId
+      trainerId,
+      deviation
     });
 
     await newTiming.save();

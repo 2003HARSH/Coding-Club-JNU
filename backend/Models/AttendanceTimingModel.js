@@ -20,6 +20,7 @@ const attendanceTimingSchema = new mongoose.Schema({
       latitude: Number,   // NEW
   longitude: Number,
     sessionCode: String,
+    deviation:Number,
 },{ collection: 'AttendanceTiming' });
 
 module.exports = mongoose.model('AttendanceTiming', attendanceTimingSchema);

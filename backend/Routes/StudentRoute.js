@@ -151,8 +151,8 @@ router.post('/StudentAttendance', async (req, res) => {
     }
 
     const distance = calculateDistance(latitude, longitude, teacherLat, teacherLng);
-console.log(distance)
-    if (distance > 10) {
+console.log(activeSession.deviation)
+    if (distance > activeSession.deviation) {
       return res.status(403).json({ message: "You are not within 5 meters of the class. Attendance denied." });
     }
 

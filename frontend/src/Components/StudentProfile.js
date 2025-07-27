@@ -103,7 +103,7 @@ function StudentAttendance() {
 
       {!isAttendanceOpen ? (
         <div className="attendance-closed">
-          <h3>Attendance is currently closed. Please wait for your trainer to open the session.</h3>
+          <h3>Attendance is currently closed. Please wait for your trainer to open the session. keep refreshing</h3>
         </div>
       ) : (
         <div className="attendance-container">
